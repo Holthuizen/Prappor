@@ -41,7 +41,7 @@ def input_handeler(msg):
 
 ping = Ping("ping",[])
 commands[ping.command] = ping 
-
+#hi
 
 class MyClient(discord.Client):
     async def on_ready(self):
