@@ -1,7 +1,9 @@
-#pip install -U discord.py
+#commands
+#pipenv install discord.py
+#pipenv install 
+#pipenv run bot.py
 
 import discord
-
 class MyClient(discord.Client):
     async def on_ready(self):
         print('Logged on as', self.user)
@@ -14,5 +16,9 @@ class MyClient(discord.Client):
         if message.content == 'ping':
             await message.channel.send('pong')
 
+        if message.content == 'send_img':
+            await message.channel.send(file=discord.File('./Media/9x19mm.png'))
+
 client = MyClient()
-client.run('ODgxOTE2MDI4ODc0MDIyOTQz.YSzyTg.DSIGDWT4lgJP2z3rdv_g9GpKLs0')
+client.run('ODgxOTE2MDI4ODc0MDIyOTQz.YSzyTg.XVbikqQpaNk5SlG7iB5FuRKwYno')
+
