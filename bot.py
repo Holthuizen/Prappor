@@ -4,6 +4,45 @@
 #pipenv run bot.py
 
 import discord
+
+prefix = "`"
+commands = {}
+
+class Ping:
+    def __init__(self,base_command,arguments):
+        self.command = base_command
+        self.arguments = arguments
+        self.type = "string"
+    def run(self,args): 
+        return "Pong"
+
+
+class Ammo:
+    def __init__(self,base_command,arguments):
+        self.command = base_command
+        self.arguments = arguments
+        self.type = "file"
+    def run(self,args): 
+        return "Pong"    
+
+
+
+def input_handeler(msg):
+    if len(msg) > 1: 
+        msg = msg[1:] #remove prefix
+        _input_list = msg.split()
+        command = _input_list[0]
+        arguments = _input_list[1:]
+
+        if command in commands:
+            responce = commands[command].run(arguments)
+            return responce
+
+
+ping = Ping("ping",[])
+commands[ping.command] = ping 
+
+
 class MyClient(discord.Client):
     async def on_ready(self):
         print('Logged on as', self.user)
@@ -13,12 +52,27 @@ class MyClient(discord.Client):
         if message.author == self.user:
             return
 
-        if message.content == 'ping':
-            await message.channel.send('pong')
 
+    
         if message.content == 'send_img':
             await message.channel.send(file=discord.File('./Media/9x19mm.png'))
 
+
+        if message.content.startswith(prefix):
+            await message.channel.send(input_handeler(message.content))
+
+
+
 client = MyClient()
-client.run('ODgxOTE2MDI4ODc0MDIyOTQz.YSzyTg.XVbikqQpaNk5SlG7iB5FuRKwYno')
+client.run('ODgxOTE2MDI4ODc0MDIyOTQz.YSzyTg.tSsW_C3Is1DHytj752msnI74P3A')
+
+
+
+
+
+
+
+
+
+
 
