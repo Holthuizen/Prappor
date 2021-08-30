@@ -8,16 +8,22 @@ import discord
 prefix = "`"
 commands = {}
 
-
 class Ping:
     def __init__(self,base_command,arguments):
         self.command = base_command
         self.arguments = arguments
+        self.type = "string"
     def run(self,args): 
         return "Pong"
 
 
-
+class Ammo:
+    def __init__(self,base_command,arguments):
+        self.command = base_command
+        self.arguments = arguments
+        self.type = "file"
+    def run(self,args): 
+        return "Pong"    
 
 
 
