@@ -23,6 +23,15 @@ async def on_ready():
 async def on_member_join(member):
     await member.send(f"Hello, soldier. What are you interested in? Cash? Goods? Ah, you want a Bot... Sure, I'll give you a Bot. If you need me, use {PREFIX} followed by help")
 
+@client.event
+async def on_command_error(ctx,error):
+    if isinstance(error,commands.MissingRequiredArgument):
+        await ctx.send("Missing a required Argument. command is incomplete")
+
+    if isinstance(error,commands.CommandNotFound):
+        await ctx.send(f"Command not found, use {PREFIX}help, for more information")
+    
+    print(error) #make a logging function in the future. 
 
 @client.command()
 async def ping(ctx):
@@ -61,10 +70,12 @@ async def gunsmith(ctx , number: int):
     except:
         await ctx.send("File not found")
 
+
+#token must be in a separate file that doesn't get pushed to git
 token = ""
 
 with open('key.txt', 'r') as reader:
-    # Read & print the entire file
+    #Read & print the token
     token += reader.read()
     print(token)
 client.run(token)
