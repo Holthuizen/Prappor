@@ -4,67 +4,65 @@
 #pipenv run bot.py
 
 import discord
+from discord.ext import commands
 
-prefix = "`"
-commands = {}
+PREFIX = "?"
+DESCRIPTION = "A Tarkov Assistant"
+client = commands.Bot(command_prefix=PREFIX, description=DESCRIPTION)
 
-class Ping:
-    def __init__(self,base_command,arguments):
-        self.command = base_command
-        self.arguments = arguments
-        self.type = "string"
-    def run(self,args): 
-        return "Pong"
+def is_me(m):
+    return m.author == client.user
 
 
-class Ammo:
-    def __init__(self,base_command,arguments):
-        self.command = base_command
-        self.arguments = arguments
-        self.type = "file"
-    def run(self,args): 
-        return "Pong"    
+@client.event
+async def on_ready():
+    print('Logged on as', client.user)
 
 
-
-def input_handeler(msg):
-    if len(msg) > 1: 
-        msg = msg[1:] #remove prefix
-        _input_list = msg.split()
-        command = _input_list[0]
-        arguments = _input_list[1:]
-
-        if command in commands:
-            responce = commands[command].run(arguments)
-            return responce
+@client.event
+async def on_member_join(member):
+    await member.send(f"Hello, soldier. What are you interested in? Cash? Goods? Ah, you want a Bot... Sure, I'll give you a Bot. If you need me, use {PREFIX} followed by help")
 
 
-ping = Ping("ping",[])
-commands[ping.command] = ping 
-#hi
-
-class MyClient(discord.Client):
-    async def on_ready(self):
-        print('Logged on as', self.user)
-
-    async def on_message(self, message):
-        # don't respond to ourselves
-        if message.author == self.user:
-            return
+@client.command()
+async def ping(ctx):
+    """Check responce time"""
+    await ctx.send(f'Pong {round(client.latency * 1000)}ms!')
 
 
-    
-        if message.content == 'send_img':
-            await message.channel.send(file=discord.File('./Media/9x19mm.png'))
+@client.command()
+async def joined(ctx, member: discord.Member):
+    """Says when a member joined."""
+    await ctx.send(f'{member.name} joined in {member.joined_at}')
 
 
-        if message.content.startswith(prefix):
-            await message.channel.send(input_handeler(message.content))
+@client.command(category="Util")
+async def clear_bot(ctx,amount=10):
+    """Remove last 10 messages of this bot"""
+    deleted = await ctx.channel.purge(limit=amount, check=is_me)
+    await ctx.channel.send('Deleted {} message(s)'.format(len(deleted)))
 
 
+@client.command()
+async def clear_all(ctx):
+    """Remove ALL messages"""
+    deleted = await ctx.channel.purge()
+    await ctx.channel.send('Deleted {} message(s)'.format(len(deleted)))   
 
-client = MyClient()
-client.run('ODgxOTE2MDI4ODc0MDIyOTQz.YSzyTg.tSsW_C3Is1DHytj752msnI74P3A')
+
+@client.command(aliases=["Gunsmith", "part", "Part"])
+async def gunsmith(ctx , number: int):
+    """Get info per Gunsmith task"""
+
+    await ctx.send(f"Gunsmith part {str(number)}")
+    try:
+        _file = discord.File(f"./Media/Gunsmith/Part{str(number)}.png")
+        await ctx.send(file=_file)
+    except:
+        await ctx.send("File not found")
+
+
+client.run('ODgxOTE2MDI4ODc0MDIyOTQz.YSzyTg.AQ719nJffZ5KjTkuWr7WGyMHO00')
 
 
 
