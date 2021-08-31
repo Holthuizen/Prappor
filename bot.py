@@ -61,8 +61,13 @@ async def gunsmith(ctx , number: int):
     except:
         await ctx.send("File not found")
 
+token = ""
 
-client.run('ODgxOTE2MDI4ODc0MDIyOTQz.YSzyTg.AQ719nJffZ5KjTkuWr7WGyMHO00')
+with open('key.txt', 'r') as reader:
+    # Read & print the entire file
+    token += reader.read()
+    print(token)
+client.run(token)
 
 
 
