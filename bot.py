@@ -8,7 +8,9 @@ from discord.ext import commands
 
 PREFIX = "?"
 DESCRIPTION = "A Tarkov Assistant"
-client = commands.Bot(command_prefix=PREFIX, description=DESCRIPTION)
+intents = discord.Intents.default()
+intents.members = True
+client = commands.Bot(command_prefix=PREFIX, intents=intents, description=DESCRIPTION)
 
 def is_me(m):
     return m.author == client.user
@@ -21,7 +23,8 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member):
-    await member.send(f"Hello, soldier. What are you interested in? Cash? Goods? Ah, you want a Bot... Sure, I'll give you a Bot. If you need me, use {PREFIX} followed by help")
+    await member.send("Hello, soldier. What are you interested in? Cash? Goods? Ah, you want a Bot... Sure, I'll give you one. Use ? followed by a help to see all commands")
+
 
 @client.event
 async def on_command_error(ctx,error):
