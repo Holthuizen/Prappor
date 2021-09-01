@@ -2,11 +2,12 @@
 #pipenv install discord.py
 #pipenv install 
 #pipenv run bot.py
-
+import os
 import discord
 from discord.ext import commands
+import random
 
-PREFIX = "?"
+PREFIX = ">"
 DESCRIPTION = "A Tarkov Assistant"
 intents = discord.Intents.default()
 intents.members = True
@@ -32,8 +33,8 @@ async def on_command_error(ctx,error):
         await ctx.send("Missing a required Argument. command is incomplete")
 
     if isinstance(error,commands.CommandNotFound):
-        await ctx.send(f"Command not found, use {PREFIX}help, for more information")
-    
+        #await ctx.send(f"Command not found, use {PREFIX}help, for more information")
+        print(error)
     print(error) #make a logging function in the future. 
 
 @client.command()
@@ -48,8 +49,8 @@ async def joined(ctx, member: discord.Member):
     await ctx.send(f'{member.name} joined in {member.joined_at}')
 
 
-@client.command(category="Util")
-async def clear_bot(ctx,amount=10):
+@client.command()
+async def clear(ctx,amount=10):
     """Remove last 10 messages of this bot"""
     deleted = await ctx.channel.purge(limit=amount, check=is_me)
     await ctx.channel.send('Deleted {} message(s)'.format(len(deleted)))
@@ -64,14 +65,37 @@ async def clear_all(ctx):
 
 @client.command(aliases=["Gunsmith", "part", "Part"])
 async def gunsmith(ctx , number: int):
-    """Get info per Gunsmith task"""
-
+    """Use gunsmith / part followed by a nr Get info per Gunsmith task"""
     await ctx.send(f"Gunsmith part {str(number)}")
     try:
         _file = discord.File(f"./Media/Gunsmith/Part{str(number)}.png")
         await ctx.send(file=_file)
     except:
         await ctx.send("File not found")
+
+
+
+
+@client.command(aliases=["Ammo","cal"])
+async def ammo(ctx,bullet="default"):
+    """Use ammo/cal followed by a calibar, to get a table of this calibar"""
+    if not bullet == "default": 
+        destdir = "./Media/Bullets"
+        files = [ f for f in os.listdir(destdir) if os.path.isfile(os.path.join(destdir,f)) ]
+        for file in files: 
+            if bullet in file: 
+                await ctx.send(file=discord.File(f'./Media/Bullets/{file}'))
+                return 
+    await ctx.send(file=discord.File('./Media/Ammo/ammo.png'))    
+    await ctx.send("command: Ammo <caliber>")    
+
+
+@client.command(aliases=['coin-flip', 'coin', 'flip'])
+async def head_or_tails(ctx):
+    options = ["heads","tails"]
+    await ctx.send(random.choice(options))
+
+
 
 
 #token must be in a separate file that doesn't get pushed to git
