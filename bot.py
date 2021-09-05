@@ -11,12 +11,47 @@ PREFIX = ">"
 DESCRIPTION = "A Tarkov Assistant"
 intents = discord.Intents.default()
 intents.members = True
-client = commands.Bot(command_prefix=PREFIX, intents=intents, description=DESCRIPTION)
+
+"""Custom help command"""
+class CustomHelpCommand(commands.MinimalHelpCommand):
+    def __init__(self) -> None:
+        super().__init__()
+
+    async def send_bot_help(self,mapping):
+        #only show relevant commands
+        commands = await self.filter_commands([ping,ammo,gunsmith,head_or_tails])
+        #create an embed obj
+        help_embed = discord.Embed(color=discord.Colour.green(), title="Help")
+        help_embed.set_thumbnail(url='https://static.wikia.nocookie.net/escape-from-tarkov/images/1/17/Prapor_portrait.jpg/revision/latest?cb=20190905181528')
+        for command in commands: 
+            if command.description:
+                help_embed.add_field(name=f"{command.name} {command.description}",value= f"Aliases: {command.aliases} \n {command.help}\n", inline=False)
+            else: 
+                help_embed.add_field(name=f"{command.name}",value= f"Aliases: {command.aliases} \n {command.help}\n", inline=False)
+
+
+        await self.get_destination().send(embed=help_embed)
+
+
+    async def send_command_help(self, command):
+        help_embed = discord.Embed(color=discord.Colour.green(), title=f"{command.name} help")
+        help_embed.set_thumbnail(url='https://static.wikia.nocookie.net/escape-from-tarkov/images/1/17/Prapor_portrait.jpg/revision/latest?cb=20190905181528')
+
+        command.aliases.append(command.name)
+        _names = ", ".join(command.aliases)
+        help_embed.add_field(name=f"{_names}\n",value=f"{command.help}\n attributes: {command.description} ", inline=False)
+
+        await self.get_destination().send(embed=help_embed)
+
+client = commands.Bot(command_prefix=PREFIX, help_command=CustomHelpCommand(), intents=intents, description=DESCRIPTION)
+
+
 
 def is_me(m):
     return m.author == client.user
 
-
+"""Events"""
+ 
 @client.event
 async def on_ready():
     print('Logged on as', client.user)
@@ -33,15 +68,12 @@ async def on_command_error(ctx,error):
         await ctx.send("Missing a required Argument. command is incomplete")
 
     if isinstance(error,commands.CommandNotFound):
-        #await ctx.send(f"Command not found, use {PREFIX}help, for more information")
+        await ctx.send(f"Command not found, use {PREFIX}help, for more information")
         print(error)
     print(error) #make a logging function in the future. 
 
-@client.command()
-async def ping(ctx):
-    """Check responce time"""
-    await ctx.send(f'Pong {round(client.latency * 1000)}ms!')
 
+"""Test Commands"""
 
 @client.command()
 async def joined(ctx, member: discord.Member):
@@ -63,9 +95,17 @@ async def clear_all(ctx):
     await ctx.channel.send('Deleted {} message(s)'.format(len(deleted)))   
 
 
-@client.command(aliases=["Gunsmith", "part", "Part"])
+
+
+"""Official Commands"""
+
+@client.command(brief="Pong", help="A command to test the responce time between client and bot")
+async def ping(ctx):
+    await ctx.send(f'Pong {round(client.latency * 1000)}ms!')
+
+
+@client.command(aliases=["part","gun"], help="Returns a images with all importend information per Gunsmith task", description="<number>")
 async def gunsmith(ctx , number: int):
-    """Use gunsmith / part followed by a nr Get info per Gunsmith task"""
     await ctx.send(f"Gunsmith part {str(number)}")
     try:
         _file = discord.File(f"./Media/Gunsmith/Part{str(number)}.png")
@@ -75,10 +115,8 @@ async def gunsmith(ctx , number: int):
 
 
 
-
-@client.command(aliases=["Ammo","cal"])
+@client.command(aliases=["a","cal"], help="Returns a table of all rounds in the given caliber", description="<caliber name>" )
 async def ammo(ctx,bullet="default"):
-    """Use ammo/cal followed by a calibar, to get a table of this calibar"""
     if not bullet == "default": 
         destdir = "./Media/Bullets"
         files = [ f for f in os.listdir(destdir) if os.path.isfile(os.path.join(destdir,f)) ]
@@ -87,13 +125,18 @@ async def ammo(ctx,bullet="default"):
                 await ctx.send(file=discord.File(f'./Media/Bullets/{file}'))
                 return 
     await ctx.send(file=discord.File('./Media/Ammo/ammo.png'))    
-    await ctx.send("command: Ammo <caliber>")    
+    await ctx.send("command: ammo <caliber>")    
 
 
-@client.command(aliases=['coin-flip', 'coin', 'flip'])
+@client.command(aliases=['coin-flip', 'coin', 'flip'], help="Flips a coin, returns --> head or tails")
 async def head_or_tails(ctx):
     options = ["heads","tails"]
     await ctx.send(random.choice(options))
+
+
+
+
+
 
 
 
