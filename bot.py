@@ -137,9 +137,10 @@ async def head_or_tails(ctx):
 
 
 
-
-
-
+@client.command(aliases=['stims','','injectors'])
+async def stim(ctx): 
+    await ctx.send(file=discord.File('./Media/Meds/Stims.webp'))
+    await ctx.send("https://escapefromtarkov.fandom.com/wiki/Medical")
 
 #token must be in a separate file that doesn't get pushed to git
 token = ""
